@@ -9,4 +9,5 @@ http://blog.smalleycreative.com/tutorials/using-git-and-github-to-manage-your-do
     chmod +x makesymlinks.sh
     ./makesymlinks.sh
 
-
+## OmniCompletion
+to use, hold Ctrl+X then Ctrl+O while in Insert mode.
