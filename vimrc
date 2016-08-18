@@ -37,6 +37,7 @@ if !filereadable(vundle_readme)
 endif
 
 " set the runtime path to include Vundle and initialize
+" Vundle 管理的插件列表必須位於 vundle#begin() 和 vundle#end() 之間
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
@@ -45,8 +46,13 @@ Plugin 'VundleVim/Vundle.vim'
 
 " Keep Plugin commands between vundle#begin/end.
 " plugin on GitHub repo
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'scrooloose/nerdtree'
+Plugin 'easymotion/vim-easymotion'
+Plugin 'nathanaelkane/vim-indent-guides'
+Plugin 'kshenoy/vim-signature'
 "Plugin 'tpope/vim-fugitive'
-"Plugin 'kien/ctrlp.vim'
 "Plugin 'sukima/xmledit'
 "Plugin 'sjl/gundo.vim'
 "Plugin 'jiangmiao/auto-pairs'
@@ -58,7 +64,6 @@ Plugin 'VundleVim/Vundle.vim'
 "Plugin 't9md/vim-quickhl'
 "Plugin 'Lokaltog/vim-powerline'
 "Plugin 'scrooloose/nerdcommenter'
-"Plugin 'Lokaltog/vim-easymotion'
 "Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
 "Plugin 'tpope/vim-rails.git'
 " plugin from http://vim-scripts.org/vim/scripts.html（vim-scripts repos）
@@ -75,6 +80,7 @@ Plugin 'VundleVim/Vundle.vim'
 "Plugin 'git://git.wincent.com/command-t.git'
 
 " All of your Plugins must be added before the following line
+" Vundle插件列表結束
 call vundle#end()            " required
 filetype plugin indent on    " required
 " To ignore plugin indent changes, instead use:
@@ -85,6 +91,55 @@ filetype plugin indent on    " required
 " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
 " :PluginSearch foo - searches for foo; append `!` to refresh local cache
 " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 01. Plugin Setup                                                                 "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Plugin 'vim-airline/vim-airline'
+" enable tabline (Smarter tab line)
+let g:airline#extensions#tabline#enabled = 1
+" " set left separator
+"let g:airline#extensions#tabline#left_sep = ' '
+" " set left separator which are not editting
+"let g:airline#extensions#tabline#left_alt_sep = '|'
+" " show buffer number
+let g:airline#extensions#tabline#buffer_nr_show = 1
+" :bn  跳下一個buffer
+" :bp  往上一個buffer
+" :b n 跳往第n個buffer
+" :bd  關掉目前buffer
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+let g:airline_left_sep = '→'
+"let g:airline_left_alt_sep = '＞'
+let g:airline_right_sep = '←'
+"let g:airline_right_alt_sep = '＜'
+let g:airline_symbols.linenr = '¶'
+"let g:airline_symbols.branch = ''
+
+" Plugin 'scrooloose/nerdtree'
+" 在 Vim 啟動的時候默認開啟 NERDTree（autocmd 可以縮寫為 au）
+"autocmd VimEnter * NERDTree
+" 按下 F2 調出/隱藏 NERDTree
+map  <silent> <F2> :NERDTreeToggle<CR>
+" 將 NERDTree 的窗口設置在 Vim 窗口的右側（默認為左側）
+let NERDTreeWinPos="right"
+" 當打開 NERDTree 窗口時，自動顯示 Bookmarks
+let NERDTreeShowBookmarks=1
+
+" Plugin 'nathanaelkane/vim-indent-guides'
+"隨 Vim 自啟動
+let g:indent_guides_enable_on_vim_startup=1
+" 從第二層開始可視化顯示縮進
+let g:indent_guides_start_level=2
+" 色塊寬度
+let g:indent_guides_guide_size=1
+" 快捷鍵 i 開/關縮進可視化
+" :nmap <silent> <Leader>i <Plug>IndentGuidesToggle
+
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 02. Events                                                                 "
@@ -100,11 +155,14 @@ autocmd FileType ruby setlocal sw=2 ts=2 sts=2
 " Enable omnicompletion (to use, hold Ctrl+X then Ctrl+O while in Insert mode.
 set ofu=syntaxcomplete#Complete
 
+set mouse=a
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 03. Theme/Colors                                                           "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set t_Co=256              " enable 256-color mode.
-syntax enable             " enable syntax highlighting (previously syntax on).
+"syntax on                " 允語用指定語法高亮配色方案替換默認方案
+syntax enable             " 開啟語法高亮功能。enable syntax highlighting (previously syntax on).
 colorscheme molokai       " set colorscheme
 let g:molokai_original = 1  " match the original monokai background color
 let g:rehash256 = 1       " bring the 256 color version as close as possible to the the default (dark) GUI version
@@ -136,30 +194,36 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set number                " show line numbers
 set numberwidth=6         " make the number gutter 6 characters wide
-set cul                   " highlight current line
+set cursorline            " highlight current line(cul)
+set cursorcolumn          " 高亮顯示當前行/列
 set laststatus=2          " last window always has a statusline
 set nohlsearch            " Don't continue to highlight searched phrases.
-set incsearch             " But do highlight as you type your search.
+"set hlsearch              " 高亮顯示搜索結果
+set incsearch             " But do highlight as you type your search.(開啟實時搜索功能)
 set ignorecase            " Make searches case-insensitive.
 set ruler                 " Always show info along bottom.
 set showmatch
 set statusline=%<%f\%h%m%r%=%-20.(line=%l\ \ col=%c%V\ \ totlin=%L%)\ \ \%h%m%r%=%-40(bytval=0x%B,%n%Y%)\%P
 set visualbell
-set backspace=2         "可隨時用倒退鍵刪除
-set showmode            "左下角那一列的狀態
+set backspace=2           "可隨時用倒退鍵刪除
+set showmode              "左下角那一列的狀態
+set wildmenu              " Vim自身命令行模式智能補全
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 05. Text Formatting/Layout                                                 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set autoindent            " auto-indent
-set tabstop=2             " tab spacing
-set softtabstop=2         " unify
-set shiftwidth=2          " indent/outdent by 2 columns
+set tabstop=4             " tab spacing(設置編輯時製表符佔用空格數)
+set softtabstop=4         " unify(讓vim把連續數量的空格視為一個製表符)
+set shiftwidth=4          " indent/outdent by 2 columns(設置格式化時製表符佔用空格數)
 set shiftround            " always indent/outdent to the nearest tabstop
-set expandtab             " use spaces instead of tabs
+set expandtab             " use spaces instead of tabs(將製表符擴展為空格)
 set smartindent           " automatically insert one extra level of indentation
 set smarttab              " use tabs at the start of a line, spaces elsewhere
-set nowrap                " don't wrap text
+set nowrap                " don't wrap text(禁止折行)
+"set foldmethod=indent    " 基於縮進或語法進行代碼摺疊
+set foldmethod=syntax     " za(打開或關閉當前摺疊)；zM(關閉所有摺疊)；zR(打開所有摺疊)
+set nofoldenable          " 啟動Vim時關閉摺疊代碼
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 06. Custom Commands                                                        "
